@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wichteln 2025 – Los ziehen</title>
+  <title>Wichteln 2026 – Los ziehen</title>
   <style>
     html {
       overflow-x: hidden;
@@ -100,7 +100,7 @@
 <body>
   <div class="content-area">
     <div class="container">
-      <h1>Wichteln 2025</h1>
+      <h1>Wichteln 2026</h1>
 
       <div id="admin-login">
         <h2>Admin-Zugang</h2>
@@ -129,8 +129,6 @@
 
   <script>
     const participants = ["Jens","Susanne","Claus","Inga","Ole","Caroline","Henrik","Annbritt"];
-    const fixedGiver = "Jens";
-    const fixedReceiver = "Susanne";
 
     const forbiddenPairs = [
       ["Claus", "Susanne"], ["Susanne", "Claus"],
@@ -184,7 +182,7 @@
           const contentArea = document.querySelector('.content-area');
           contentArea.innerHTML = `
             <div class="container">
-              <h1>Wichteln 2025</h1>
+              <h1>Wichteln 2026</h1>
               <p style="color: red; font-size: 1.2em;">Ungültiger oder abgelaufener Link! Bitte Admin kontaktieren.</p>
             </div>`;
           document.querySelector('.background-area').style.display = 'none';
@@ -303,39 +301,33 @@
         }
 
 function generateAssignments() {
+  // Zufällige, vollständige Zuordnung: niemand zieht sich selbst,
+  // ausgeschlossene Paarungen und gegenseitige Ziehungen werden vermieden.
   const assignments = {};
-  const availableReceivers = participants.slice(); // alle Teilnehmer verfügbar
+  const givers = [...participants].sort(() => Math.random() - 0.5);
 
-  // Jens zieht immer Susanne
-  assignments[fixedGiver] = fixedReceiver;
-  const indexFixed = availableReceivers.indexOf(fixedReceiver);
-  if(indexFixed > -1) availableReceivers.splice(indexFixed, 1); // Susanne aus Liste entfernen
+  function backtrack(index, availableReceivers) {
+    if (index === givers.length) return true;
 
-  // restliche Teilnehmer
-  const remainingGivers = participants.filter(p => p !== fixedGiver);
+    const giver = givers[index];
+    const possibleReceivers = availableReceivers
+      .filter(receiver => receiver !== giver)
+      .filter(receiver => !forbiddenPairs.some(pair => pair[0] === giver && pair[1] === receiver))
+      .filter(receiver => assignments[receiver] !== giver)
+      .sort(() => Math.random() - 0.5);
 
-  for(let giver of remainingGivers) {
-    // mögliche Receiver für diesen Giver
-    let possibleReceivers = availableReceivers.filter(r => {
-      if(r === giver) return false; // nicht sich selbst
-      if(forbiddenPairs.some(pair => pair[0] === giver && pair[1] === r)) return false; // keine Paare
-      if(assignments[r] === giver) return false; // keine gegenseitige Ziehung
-      return true;
-    });
-
-    if(possibleReceivers.length === 0) {
-      // keine Lösung -> kompletten Versuch neu starten
-      return generateAssignments();
+    for (const receiver of possibleReceivers) {
+      assignments[giver] = receiver;
+      const remainingReceivers = availableReceivers.filter(name => name !== receiver);
+      if (backtrack(index + 1, remainingReceivers)) return true;
+      delete assignments[giver];
     }
-
-    const receiver = possibleReceivers[Math.floor(Math.random() * possibleReceivers.length)];
-    assignments[giver] = receiver;
-
-    // Receiver aus verfügbarer Liste entfernen
-    const index = availableReceivers.indexOf(receiver);
-    if(index > -1) availableReceivers.splice(index, 1);
+    return false;
   }
 
+  if (!backtrack(0, [...participants])) {
+    throw new Error('Es konnte keine gültige Wichtel-Zuordnung erstellt werden.');
+  }
   return assignments;
 }
 
