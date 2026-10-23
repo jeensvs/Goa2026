@@ -1,0 +1,44 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  color: black;
+  background: white; /* oberer Bereich bleibt weiß */
+}
+
+h1 {
+  margin-top: 50px;
+  font-size: 2.5em;
+}
+
+button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 1.2em;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 0, 0, 0.85);
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: rgba(200, 0, 0, 0.95);
+}
+
+.content {
+  margin-top: 60px; /* Abstand unter Start-Button */
+  min-height: 100vh;
+  background: url('images/background.jpg') no-repeat center top fixed;
+  background-size: cover;
+  padding-top: 40px;
+}
+
+#drawArea {
+  font-size: 2em;
+  font-weight: bold;
+  color: black;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+}
